@@ -94,7 +94,10 @@ input_df = pd.DataFrame([{
 # ─────────────────────────────────────────
 if st.button("🚀 Predict Income"):
 
+    # Probability for >50K class
     proba = model.predict_proba(input_df)[0][1]
+
+    # Apply threshold
     prediction = ">50K" if proba >= threshold else "<=50K"
 
     st.markdown("---")
@@ -102,18 +105,28 @@ if st.button("🚀 Predict Income"):
     # Result
     if prediction == ">50K":
         st.success("💰 High Income (>50K)")
+        confidence = proba
     else:
         st.warning("📉 Lower Income (<=50K)")
+        confidence = 1 - proba
 
-    # Better probability display (fix for 1.00 issue)
-    st.metric("Probability of High Income", f"{proba:.2%}")
+    # Confidence display
+    st.subheader("📊 Prediction Confidence")
+
+    st.metric(
+        "Confidence Score",
+        f"{confidence:.2%}"
+    )
 
     # Progress bar
-    st.progress(int(proba * 100))
+    st.progress(float(confidence))
+
+    # Show both probabilities
+    st.write(f"💰 High Income Probability: {proba:.2%}")
+    st.write(f"💼 Lower Income Probability: {(1 - proba):.2%}")
 
     # Threshold info
     st.caption(f"Decision Threshold: {threshold}")
-
 # ─────────────────────────────────────────
 # Footer
 # ─────────────────────────────────────────
